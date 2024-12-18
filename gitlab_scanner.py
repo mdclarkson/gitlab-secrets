@@ -15,7 +15,7 @@ def commit_print(project:str, repository:str , commits: set[str]):
 
 def get_repository_id_from_name(project:str, repository:str) -> int:
     url = f"{gitlab_instance_url}/api/v4/projects/{project}%2f{repository}?simple=true"
-    data = requests.get(url, headers=request_headers)
+    data = requests.get(url, headers=request_headers, timeout=60)
     datajson = data.json()
     id = datajson['id']
     logging.info(f"Got id {id} for {project}/{repository}")
@@ -23,7 +23,7 @@ def get_repository_id_from_name(project:str, repository:str) -> int:
 
 def get_all_commits(repo_id:int) -> set[str]:
     url = f"{gitlab_instance_url}/api/v4/projects/{repo_id}/events?action=pushed"
-    data = requests.get(url, headers=request_headers)
+    data = requests.get(url, headers=request_headers, timeout=60)
     datajson = data.json()
     commits = set()
     for event in datajson:
@@ -41,7 +41,7 @@ def get_all_official_commits(repo_id:int) -> set[str]:
     # Only 3 years of events stored, so avoiding false positives of older commits which no longer
     # have a stored event
     url = f"{gitlab_instance_url}/api/v4/projects/{repo_id}/repository/commits?all=true&since={timestamp}"
-    data = requests.get(url, headers=request_headers)
+    data = requests.get(url, headers=request_headers, timeout=60)
     datajson = data.json()
     commits = set()
     for commit in datajson:
